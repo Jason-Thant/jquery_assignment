@@ -2,10 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Interactive Web Form Assignment</title>
+  <title>Interactive Form Assignment</title>
 
   <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    rel="stylesheet">
 
   <style>
     .error-text {
@@ -13,13 +15,17 @@
       font-size: 0.9rem;
       margin-top: 3px;
     }
+    .error-border {
+      border-color: red !important;
+    }
   </style>
 </head>
 <body class="bg-light">
+
   <div class="container mt-5">
     <div class="card shadow">
       <div class="card-body">
-        <h3 class="mb-4">Interactive Web Form</h3>
+        <h3 class="mb-4">Interactive Form</h3>
 
         <!-- Username -->
         <div class="mb-3">
@@ -55,17 +61,20 @@
             Interesting Topics
             <span id="topicsError" class="error-text ms-2"></span>
           </label>
+
           <div class="form-check">
-            <input class="form-check-input topic" type="checkbox" id="topic1" value="HTML">
-            <label class="form-check-label" for="topic1">HTML</label>
+            <input class="form-check-input topic" type="checkbox" value="HTML">
+            <label class="form-check-label">HTML</label>
           </div>
+
           <div class="form-check">
-            <input class="form-check-input topic" type="checkbox" id="topic2" value="CSS">
-            <label class="form-check-label" for="topic2">CSS</label>
+            <input class="form-check-input topic" type="checkbox" value="CSS">
+            <label class="form-check-label">CSS</label>
           </div>
+
           <div class="form-check">
-            <input class="form-check-input topic" type="checkbox" id="topic3" value="JavaScript">
-            <label class="form-check-label" for="topic3">JavaScript</label>
+            <input class="form-check-input topic" type="checkbox" value="JavaScript">
+            <label class="form-check-label">JavaScript</label>
           </div>
         </div>
 
@@ -91,101 +100,72 @@
 
   <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
     $(function () {
-      function showEmptyError($input, $errorElement) {
-        $input.css('border-color', 'red');
-        $errorElement.text('this filed must not be empty');
-      }
+      $("#submitBtn").click(function () {
+        let valid = true;
 
-      function clearError($input, $errorElement) {
-        $input.css('border-color', '');
-        $errorElement.text('');
-      }
+        // Helper functions
+        function setError(input, textElement, message) {
+          input.addClass("error-border");
+          textElement.text(message);
+        }
 
-      $('#submitBtn').on('click', function (e) {
-        e.preventDefault(); // prevent page reload (just for this assignment)
-        let isValid = true;
+        function clearError(input, textElement) {
+          input.removeClass("error-border");
+          textElement.text("");
+        }
 
         // Username
-        const $username = $('#username');
-        const $usernameError = $('#usernameError');
-        if ($.trim($username.val()) === '') {
-          isValid = false;
-          showEmptyError($username, $usernameError);
-        } else {
-          clearError($username, $usernameError);
-        }
+        const u = $("#username");
+        if (u.val().trim() === "") {
+          valid = false;
+          setError(u, $("#usernameError"), "this filed must not be empty");
+        } else clearError(u, $("#usernameError"));
 
         // Email
-        const $email = $('#email');
-        const $emailError = $('#emailError');
-        if ($.trim($email.val()) === '') {
-          isValid = false;
-          showEmptyError($email, $emailError);
-        } else {
-          clearError($email, $emailError);
-        }
+        const e = $("#email");
+        if (e.val().trim() === "") {
+          valid = false;
+          setError(e, $("#emailError"), "this filed must not be empty");
+        } else clearError(e, $("#emailError"));
 
         // Password
-        const $password = $('#password');
-        const $passwordError = $('#passwordError');
-        if ($.trim($password.val()) === '') {
-          isValid = false;
-          showEmptyError($password, $passwordError);
-        } else {
-          clearError($password, $passwordError);
-        }
+        const p = $("#password");
+        if (p.val().trim() === "") {
+          valid = false;
+          setError(p, $("#passwordError"), "this filed must not be empty");
+        } else clearError(p, $("#passwordError"));
 
         // Confirm Password
-        const $confirmPassword = $('#confirmPassword');
-        const $confirmPasswordError = $('#confirmPasswordError');
-        if ($.trim($confirmPassword.val()) === '') {
-          isValid = false;
-          showEmptyError($confirmPassword, $confirmPasswordError);
-        } else {
-          clearError($confirmPassword, $confirmPasswordError);
+        const cp = $("#confirmPassword");
+        if (cp.val().trim() === "") {
+          valid = false;
+          setError(cp, $("#confirmPasswordError"), "this filed must not be empty");
+        } else clearError(cp, $("#confirmPasswordError"));
+
+        // Password match
+        if (p.val() !== cp.val() && cp.val().trim() !== "") {
+          valid = false;
+          setError(cp, $("#confirmPasswordError"), "confirmed password mismatched the password");
         }
 
-        // Confirm password must match password (only if both not empty)
-        if (
-          $.trim($password.val()) !== '' &&
-          $.trim($confirmPassword.val()) !== '' &&
-          $password.val() !== $confirmPassword.val()
-        ) {
-          isValid = false;
-          $confirmPassword.css('border-color', 'red');
-          $confirmPasswordError.text('confirmed password mismatched the password');
-        } else if ($password.val() === $confirmPassword.val() &&
-                   $.trim($confirmPassword.val()) !== '') {
-          // clear mismatch error if they match
-          $confirmPassword.css('border-color', '');
-          if ($confirmPasswordError.text() === 'confirmed password mismatched the password') {
-            $confirmPasswordError.text('');
-          }
-        }
+        // Topics
+        if ($(".topic:checked").length === 0) {
+          valid = false;
+          $("#topicsError").text("At least one topic must be selected");
+        } else $("#topicsError").text("");
 
-        // Interesting Topics: at least one checked
-        if ($('.topic:checked').length === 0) {
-          isValid = false;
-          $('#topicsError').text('At least one topic must be selected');
-        } else {
-          $('#topicsError').text('');
-        }
+        // Gender
+        if ($("#gender").val() === "--") {
+          valid = false;
+          $("#genderError").text("please choose your gender");
+        } else $("#genderError").text("");
 
-        // Gender: must not be "--"
-        if ($('#gender').val() === '--') {
-          isValid = false;
-          $('#genderError').text('please choose your gender');
-        } else {
-          $('#genderError').text('');
-        }
-
-        if (isValid) {
-          alert('Form submitted successfully (for assignment demo)!');
+        // If form valid
+        if (valid) {
+          alert("Form submitted successfully!");
         }
       });
     });
